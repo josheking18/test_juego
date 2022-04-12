@@ -1,0 +1,205 @@
+<canvas style="background-color: black;" width="500" height="500" id="pantalla">
+    <style>
+        body{
+            background-image: url(img/fondo.jpg);
+        }
+    </style>
+</canvas>
+<script>
+
+    let personaje = {
+        nombre: 'Cuadradito',
+        desp: 1,
+        x: 0,
+        y: 0,
+        izquierda: false,
+        derecha: false,
+        arriba: false,
+        abajo: false,
+        alto: 50,
+        ancho: 50,
+        colision: false,
+        color: 'green',
+        img: null
+
+
+    };
+
+    let bloques = [
+        {
+            color: 'pink',
+            x: 100,
+            y: 100,
+            alto: 50,
+            ancho: 250,
+            colision: false,
+            img: new Image()
+        },
+        {
+            color: 'green',
+            x: 250,
+            y: 250,
+            alto: 50,
+            ancho: 50,
+            colision: false,
+            img: new Image()
+        }
+    ];
+
+    let monedas = [
+        {
+            color: 'yellow',
+            x: 260,
+            y: 200,
+            alto: 20,
+            ancho: 20,
+            colision: false,
+            img: new Image(),
+            estado: true
+        }
+    ];
+
+    let canvas;
+    let ctx;
+    let img;
+
+
+    document.addEventListener('keydown', (event) => {
+        var keyValue = event.key;
+        var codeValue = event.code;
+
+        if (codeValue == 'ArrowLeft') {
+            personaje.izquierda = true;
+        }
+        if (codeValue == 'ArrowRight') {
+            personaje.derecha = true;
+        }
+        if (codeValue == 'ArrowUp') {
+            personaje.arriba = true;
+        }
+        if (codeValue == 'ArrowDown') {
+            personaje.abajo = true;
+        }
+    }, false);
+
+    document.addEventListener('keyup', (event) => {
+        var keyValue = event.key;
+        var codeValue = event.code;
+
+        if (codeValue == 'ArrowLeft') {
+            personaje.izquierda = false;
+        }
+        if (codeValue == 'ArrowRight') {
+            personaje.derecha = false;
+        }
+        if (codeValue == 'ArrowUp') {
+            personaje.arriba = false;
+        }
+        if (codeValue == 'ArrowDown') {
+            personaje.abajo = false;
+        }
+    }, false);
+
+
+    function draw() {
+        canvas = document.getElementById('pantalla');
+        ctx = canvas.getContext('2d');
+
+
+
+
+        if (canvas.getContext) {
+            ctx.clearRect(0, 0, 500, 500)
+            ctx.fillStyle = personaje.color;
+            //ctx.fillRect(personaje.x, personaje.y, personaje.ancho, personaje.alto);
+            ctx.drawImage(personaje.img, personaje.x, personaje.y, personaje.ancho, personaje.alto);
+
+            // Dibujamos el bloque
+            for (let i = 0; i < bloques.length; i++) {
+                let bloque = bloques[i];
+                if (bloque.colision) {
+                    ctx.fillStyle = 'yellow';
+                } else {
+                    ctx.fillStyle = bloque.color;
+                }
+                //ctx.(bloque.x, bloque.y, bloque.ancho, bloque.alto);
+                ctx.drawImage(bloque.img, bloque.x, bloque.y, bloque.ancho, bloque.alto);
+
+            }
+
+            // Dibujamos el bloque
+            for (let i = 0; i < monedas.length; i++) {
+                let moneda = monedas[i];
+                if(moneda.estado==true){
+                    ctx.fillStyle= 'yellow';
+                }
+
+                ctx.fillStyle = moneda.color;
+                ctx.fillRect(moneda.x, moneda.y, moneda.ancho, moneda.alto);
+
+            }
+
+        }
+    }
+
+
+
+    var timer;
+    timer = setInterval('onEnterFrame()', 0);
+    let count = 0;
+
+    function onEnterFrame() {
+        let despXAux = personaje.x;
+        let despYAux = personaje.y;
+
+
+        if (personaje.derecha) {
+            despXAux += personaje.desp;
+        }
+        if (personaje.izquierda) {
+            despXAux -= personaje.desp;
+        }
+        if (personaje.arriba) {
+            despYAux -= personaje.desp;
+        }
+        if (personaje.abajo) {
+            despYAux += personaje.desp;
+        }
+
+        personaje.colision = false;
+        for (let i = 0; i < bloques.length; i++) {
+            let bloque = bloques[i];
+            bloque.colision = false;
+            if ((bloque.x + bloque.ancho < despXAux) || (bloque.x > despXAux + personaje.ancho)) {
+
+            } else if ((bloque.y + bloque.alto < despYAux) || (bloque.y > despYAux + personaje.alto)) {
+
+            } else {
+                console.log('Colision');
+                personaje.colision = true;
+                bloque.colision = true;
+            }
+        }
+
+        if (!personaje.colision) { // Si no hay colisión
+            personaje.x = despXAux
+            personaje.y = despYAux
+        }
+
+
+        draw();
+
+    }
+
+    function inicio() {
+        personaje.img = new Image();
+        personaje.img.src = 'img/1.png';
+        for (let i = 0; i < bloques.length; i++) {
+            let bloque = bloques[i];
+            bloque.img.src = 'img/2.png';
+        }
+    }
+
+    inicio();
+
+</script>
